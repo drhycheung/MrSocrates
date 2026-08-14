@@ -19,6 +19,8 @@ MrSocrates is a *bring-your-own-key* (BYOK) app: you supply the API key, and all
 3. Go to **Keys** → **Create Key**, give it a name, and optionally set a credit limit.
 4. Copy the key. It starts with `sk-or-`.
 
+> **Free models:** OpenRouter free models end with `:free` at the end of the model name, e.g. `meta-llama/llama-3.3-70b-instruct:free`. In the app, type `free` in the model box to search for them.
+
 > **Region note:** OpenAI models on OpenRouter are region-restricted and may not work from Hong Kong. Use a non-OpenAI model instead, such as `deepseek/deepseek-chat` or `meta-llama/llama-3.3-70b-instruct`.
 
 ## OpenAI

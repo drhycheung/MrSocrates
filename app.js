@@ -134,7 +134,7 @@
   let abortController = null;
   let recognition = null;
   let listening = false;
-  let loadModelsTimer = null;
+  let modelsLoading = false;
 
   function defaultSettings() {
     return {
@@ -680,6 +680,7 @@
   }
 
   async function loadModels() {
+    if (modelsLoading) return;
     const key = els.apiKey.value.trim() || settings.apiKey || "";
     const provider = detectProvider(key);
     if (!provider) {
@@ -688,6 +689,7 @@
     }
     const baseUrl = (els.baseUrl.value.trim() || provider.baseUrl).replace(/\/+$/, "");
 
+    modelsLoading = true;
     els.refreshModels.disabled = true;
     els.modelHint.textContent = "Loading models\u2026";
 
@@ -714,9 +716,13 @@
       }
 
       els.modelHint.textContent = ids.length + " models available for " + provider.name + " (typing shows suggestions).";
+      if (provider.name === "OpenRouter") {
+        els.modelHint.textContent += " Free models end with ':free' \u2014 type 'free' in the model box to search them.";
+      }
     } catch (err) {
       els.modelHint.textContent = "Could not load models: " + (err.message || String(err));
     } finally {
+      modelsLoading = false;
       els.refreshModels.disabled = false;
     }
   }
@@ -934,14 +940,13 @@
     if (provider) {
       els.baseUrl.value = provider.baseUrl;
       els.modelHint.textContent = "Example models: " + provider.examples.join(", ");
+      if (provider.name === "OpenRouter") {
+        els.modelHint.textContent += " Free models end with ':free' \u2014 type 'free' in the model box to search them.";
+      }
       els.detectedHint.textContent = "Detected: " + provider.name + " (base URL set automatically).";
-      clearTimeout(loadModelsTimer);
-      loadModelsTimer = setTimeout(function () {
-        if (detectProvider(els.apiKey.value.trim())) loadModels();
-      }, 600);
+      loadModels();
     } else {
       els.detectedHint.textContent = "";
-      clearTimeout(loadModelsTimer);
     }
   });
   els.clearChat.addEventListener("click", function () {

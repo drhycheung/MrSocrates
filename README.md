@@ -38,6 +38,8 @@ https://drhycheung.github.io/MrSocrates/
 
 Step-by-step instructions for every supported provider — [see GETTING-API-KEYS.md](GETTING-API-KEYS.md). Poe and OpenRouter are recommended because only they work directly from the browser.
 
+On OpenRouter, free models end with `:free` at the end of the model name — type `free` in the model box to search for them.
+
 ## The prompt
 
 The system prompt lives in `config.js` (`APP_CONFIG.systemPrompt`). It is sent with every message and defines the chatbot's behaviour:
