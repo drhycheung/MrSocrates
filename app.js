@@ -134,6 +134,7 @@
   let abortController = null;
   let recognition = null;
   let listening = false;
+  let loadModelsTimer = null;
 
   function defaultSettings() {
     return {
@@ -934,8 +935,13 @@
       els.baseUrl.value = provider.baseUrl;
       els.modelHint.textContent = "Example models: " + provider.examples.join(", ");
       els.detectedHint.textContent = "Detected: " + provider.name + " (base URL set automatically).";
+      clearTimeout(loadModelsTimer);
+      loadModelsTimer = setTimeout(function () {
+        if (detectProvider(els.apiKey.value.trim())) loadModels();
+      }, 600);
     } else {
       els.detectedHint.textContent = "";
+      clearTimeout(loadModelsTimer);
     }
   });
   els.clearChat.addEventListener("click", function () {
