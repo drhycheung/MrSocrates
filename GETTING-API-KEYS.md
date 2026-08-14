@@ -20,7 +20,7 @@ MrSocrates is a *bring-your-own-key* (BYOK) app: you supply the API key, and all
 
 > No credit balance is needed — the free models work without any credits. Add credits only if you want access to the paid models too.
 
-> **Free models:** OpenRouter free models end with `:free` at the end of the model name, e.g. `meta-llama/llama-3.3-70b-instruct:free`. In the app, type `free` in the model box to search for them.
+> **Free models:** OpenRouter free models end with `:free` at the end of the model name, e.g. `nvidia/nemotron-3.5-lightning:free`. In the app, type `free` in the model box to search for them.
 
 > **Region note:** OpenAI models on OpenRouter are region-restricted and may not work from Hong Kong. Use a non-OpenAI model instead, such as `deepseek/deepseek-chat` or `meta-llama/llama-3.3-70b-instruct`.
 

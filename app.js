@@ -26,7 +26,7 @@
     testResult: $("test-result"),
     detectedHint: $("detected-hint"),
     modelHint: $("model-hint"),
-    refreshModels: $("refresh-models"),
+    clearModel: $("clear-model"),
     modelList: $("model-list"),
     saveSettings: $("save-settings"),
     resetSettings: $("reset-settings"),
@@ -701,7 +701,6 @@
     modelsAbortKey = key;
     modelsAbortBaseUrl = baseUrl;
     modelsLoading = true;
-    els.refreshModels.disabled = true;
     els.modelHint.textContent = "Loading models\u2026";
 
     try {
@@ -737,7 +736,6 @@
     } finally {
       if (modelsAbort === abort) {
         modelsLoading = false;
-        els.refreshModels.disabled = false;
       }
     }
   }
@@ -945,7 +943,10 @@
   });
 
   els.testKey.addEventListener("click", testApiKey);
-  els.refreshModels.addEventListener("click", loadModels);
+  els.clearModel.addEventListener("click", function () {
+    els.model.value = "";
+    els.model.focus();
+  });
 
   els.apiKey.addEventListener("input", function () {
     setTestResult("", "");
