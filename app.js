@@ -53,13 +53,13 @@
   const OLD_DEFAULT_MODELS = ["gpt-4o-mini", "meta/llama-3.3-70b-instruct", "z-ai/glm-5.2"];
   const HISTORY_KEY = "mrsocrates.history";
   const PROVIDERS = [
-    { prefix: /^sk-or-/i, baseUrl: "https://openrouter.ai/api/v1", model: "openai/gpt-4o-mini", name: "OpenRouter" },
+    { prefix: /^sk-or-/i, baseUrl: "https://openrouter.ai/api/v1", model: "deepseek/deepseek-chat", name: "OpenRouter" },
     { prefix: /^sk-poe-/i, baseUrl: "https://api.poe.com/v1", model: "GPT-5.4", name: "Poe" },
     { prefix: /^nvapi-/i, baseUrl: "https://integrate.api.nvidia.com/v1", model: "meta/llama-3.3-70b-instruct", name: "NVIDIA" },
     { prefix: /^gsk_/i, baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile", name: "Groq" },
     { prefix: /^sk-/i, baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini", name: "OpenAI" },
   ];
-  const KNOWN_MODELS = ["gpt-4o-mini", "meta/llama-3.3-70b-instruct", "z-ai/glm-5.2", "openai/gpt-4o-mini", "GPT-5.4", "llama-3.3-70b-versatile"];
+  const KNOWN_MODELS = ["gpt-4o-mini", "meta/llama-3.3-70b-instruct", "z-ai/glm-5.2", "openai/gpt-4o-mini", "GPT-5.4", "llama-3.3-70b-versatile", "deepseek/deepseek-chat"];
 
   function detectProvider(key) {
     return PROVIDERS.find(function (p) { return p.prefix.test(key); }) || null;
@@ -70,6 +70,32 @@
       return "Failed to fetch \u2014 blocked by the browser (CORS) or a privacy/ad-blocker extension. Try an incognito window or another browser.";
     }
     return err.message || String(err);
+  }
+
+  function describeApiError(err) {
+    if (!err || !err.error) return "";
+    const e = err.error;
+    let msg = e.message || e.code || "";
+    const raw = e.metadata && e.metadata.raw;
+    if (raw) {
+      let r = raw;
+      if (typeof r === "string") {
+        try { r = JSON.parse(r); } catch (e2) {}
+      }
+      if (r && typeof r === "object") {
+        let node = r;
+        while (node && typeof node === "object" && node.error) node = node.error;
+        if (node && typeof node.message === "string" && node.message !== msg) msg = node.message;
+      } else if (typeof r === "string" && r !== msg) {
+        msg = r;
+      }
+    }
+    if (!msg) return "";
+    let s = " \u2014 " + msg;
+    if (/region/i.test(msg)) {
+      s += " (OpenAI models are region-restricted and may not be available from Hong Kong \u2014 try a non-OpenAI model such as deepseek/deepseek-chat)";
+    }
+    return s;
   }
   const IMAGE_MIME = /^image\/(png|jpe?g|webp|gif)$/;
 
@@ -401,7 +427,7 @@
         let detail = "";
         try {
           const err = await res.json();
-          detail = err.error && (err.error.message || err.error.code) ? " " + (err.error.message || err.error.code) : "";
+          detail = describeApiError(err);
         } catch (e) {}
         throw new Error("Request failed (" + res.status + ") to " + res.url + detail);
       }

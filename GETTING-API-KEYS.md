@@ -19,6 +19,8 @@ MrSocrates is a *bring-your-own-key* (BYOK) app: you supply the API key, and all
 3. Go to **Keys** → **Create Key**, give it a name, and optionally set a credit limit.
 4. Copy the key. It starts with `sk-or-`.
 
+> **Region note:** OpenAI models on OpenRouter are region-restricted and may not work from Hong Kong. Use a non-OpenAI model instead, such as `deepseek/deepseek-chat` or `meta-llama/llama-3.3-70b-instruct`.
+
 ## OpenAI
 
 1. Sign up at [platform.openai.com](https://platform.openai.com) (note: this is separate from ChatGPT — it has its own billing).
