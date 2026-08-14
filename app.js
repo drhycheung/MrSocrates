@@ -35,6 +35,7 @@
     statusDot: $("status-dot"),
     clearBtn: $("clear-btn"),
     composerModel: $("composer-model"),
+    composerModelInput: $("composer-model-input"),
     confirmModal: $("confirm-modal"),
     confirmTitle: $("confirm-title"),
     confirmMessage: $("confirm-message"),
@@ -160,6 +161,32 @@
     const model = settings.model || APP_CONFIG.defaultModel;
     els.composerModel.textContent = model;
     els.composerModel.style.display = model ? "" : "none";
+    els.composerModelInput.hidden = true;
+  }
+
+  function showComposerModelEditor() {
+    if (!settings.apiKey) {
+      showToast("Set an API key in Settings first.");
+      return;
+    }
+    els.composerModelInput.value = settings.model || APP_CONFIG.defaultModel;
+    els.composerModelInput.hidden = false;
+    els.composerModel.style.display = "none";
+    els.composerModelInput.focus();
+    els.composerModelInput.select();
+  }
+
+  function commitComposerModel() {
+    const value = els.composerModelInput.value.trim();
+    if (!value) {
+      updateComposerModel();
+      return;
+    }
+    settings.model = value;
+    saveSettings();
+    els.model.value = value;
+    updateComposerModel();
+    showToast("Model set to " + value);
   }
 
   function appendMessage(msg, opts) {
@@ -849,6 +876,18 @@
     showToast("Settings and history reset.");
   });
   els.exportChat.addEventListener("click", exportChat);
+
+  els.composerModel.addEventListener("click", showComposerModelEditor);
+  els.composerModelInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commitComposerModel();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      updateComposerModel();
+    }
+  });
+  els.composerModelInput.addEventListener("blur", commitComposerModel);
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !els.settingsModal.classList.contains("hidden")) {
