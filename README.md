@@ -59,12 +59,16 @@ Users can override the base URL, model, and temperature in Settings; overrides a
 
 ## Local development
 
+**No web server needed** — download all the files into a local folder and double-click `index.html` (or drag it into a browser). The app runs entirely in the browser.
+
+For full functionality (especially voice input), serve it instead:
+
 ```bash
 python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-Then open **Settings**, paste an API key, press **Test**, pick a model, and chat.
+Then open **Settings**, paste an API key, press **Test**, pick a model, and chat. (Voice input needs a secure context, so it works on `localhost` or HTTPS but not when opening `index.html` directly from disk.)
 
 ## Deployment
 
