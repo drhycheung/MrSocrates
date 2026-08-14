@@ -174,6 +174,11 @@
     els.composerModel.style.display = "none";
     els.composerModelInput.focus();
     els.composerModelInput.select();
+    if (els.modelList.children.length === 0) {
+      els.apiKey.value = settings.apiKey;
+      els.baseUrl.value = settings.baseUrl || "";
+      loadModels();
+    }
   }
 
   function commitComposerModel() {
@@ -597,7 +602,7 @@
   }
 
   async function loadModels() {
-    const key = els.apiKey.value.trim();
+    const key = els.apiKey.value.trim() || settings.apiKey || "";
     const provider = detectProvider(key);
     if (!provider) {
       els.modelHint.textContent = "Enter a recognized key to load its models.";
