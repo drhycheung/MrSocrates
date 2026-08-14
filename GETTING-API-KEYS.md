@@ -15,9 +15,10 @@ MrSocrates is a *bring-your-own-key* (BYOK) app: you supply the API key, and all
 ## OpenRouter (recommended — pay-as-you-go, with free models)
 
 1. Create an account at [openrouter.ai](https://openrouter.ai).
-2. Add a small credit balance on the **Credits** page — a few dollars lasts a long time, and free models are also available.
-3. Go to **Keys** → **Create Key**, give it a name, and optionally set a credit limit.
-4. Copy the key. It starts with `sk-or-`.
+2. Go to **Keys** → **Create Key**, give it a name, and optionally set a credit limit.
+3. Copy the key. It starts with `sk-or-`.
+
+> No credit balance is needed — the free models work without any credits. Add credits only if you want access to the paid models too.
 
 > **Free models:** OpenRouter free models end with `:free` at the end of the model name, e.g. `meta-llama/llama-3.3-70b-instruct:free`. In the app, type `free` in the model box to search for them.
 
