@@ -34,6 +34,10 @@ https://drhycheung.github.io/MrSocrates/
 - **Conversation persistence** — history and settings survive page reloads.
 - **Clear conversation** — header button with a confirmation dialog.
 
+## Getting an API key
+
+Step-by-step instructions for every supported provider — [see GETTING-API-KEYS.md](GETTING-API-KEYS.md). Poe and OpenRouter are recommended because only they work directly from the browser.
+
 ## The prompt
 
 The system prompt lives in `config.js` (`APP_CONFIG.systemPrompt`). It is sent with every message and defines the chatbot's behaviour:

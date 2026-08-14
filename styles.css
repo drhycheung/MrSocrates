@@ -550,6 +550,49 @@ body {
   font-weight: 600;
 }
 
+.key-help {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.key-help summary {
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.key-help summary:hover {
+  color: var(--accent);
+}
+
+.key-help-body {
+  padding: 0 10px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.key-help-body p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.key-help-body code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+  font-size: 11px;
+}
+
+.key-help-body a {
+  color: var(--accent);
+}
+
+
 .key-row {
   display: flex;
   gap: 8px;
