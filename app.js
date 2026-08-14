@@ -370,6 +370,16 @@
     setComposerState();
     abortController = new AbortController();
 
+    let streamRenderTimer = null;
+    function scheduleStreamRender() {
+      if (streamRenderTimer) return;
+      streamRenderTimer = setTimeout(function () {
+        streamRenderTimer = null;
+        renderMarkdown(cursorEl, assistantMsg.content);
+        scrollToBottom();
+      }, 30);
+    }
+
     try {
       const res = await fetch(settings.baseUrl.replace(/\/+$/, "") + "/chat/completions", {
         method: "POST",
@@ -425,8 +435,7 @@
               const delta = json.choices[0].delta ? json.choices[0].delta.content : "";
               if (delta) {
                 assistantMsg.content += delta;
-                cursorEl.textContent = assistantMsg.content;
-                scrollToBottom();
+                scheduleStreamRender();
               }
             } else if (json.error || json.message) {
               serverError = json.error && json.error.message ? json.error.message : json.message;
@@ -453,6 +462,7 @@
         row.classList.add("error");
       }
     } finally {
+      if (streamRenderTimer) { clearTimeout(streamRenderTimer); streamRenderTimer = null; }
       streaming = false;
       cursorEl.classList.remove("cursor");
       cursorEl.textContent = "";
