@@ -4,6 +4,10 @@ A static, zero-backend BYOK (Bring Your Own Key) Socratic-tutor chatbot. Student
 
 Host it anywhere that serves static files (GitHub Pages, Netlify, Cloudflare Pages, or a local `http.server`). No server, no database, no build step.
 
+## Live site
+
+https://drhycheung.github.io/MrSocrates/
+
 ## Features
 
 - **BYOK** — each user enters their own API key in Settings; keys are stored only in the browser's `localStorage` and never leave the client.
