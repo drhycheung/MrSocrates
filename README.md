@@ -13,7 +13,7 @@ https://drhycheung.github.io/MrSocrates/
 ## Features
 
 - **BYOK** — each user enters their own API key in Settings; keys are stored only in the browser's `localStorage` and never leave the client.
-- **Provider auto-detection** — the provider is detected from the key prefix and the correct base URL (and a default model) are set automatically:
+- **Provider auto-detection** — the provider is detected from the key prefix and the correct base URL is set automatically:
 
   | Key prefix | Provider | Base URL |
   |---|---|---|
@@ -25,8 +25,8 @@ https://drhycheung.github.io/MrSocrates/
 
   > **Note:** only providers that send CORS headers work from a purely static site. OpenRouter and Poe are the reliable choices; OpenAI/NVIDIA/Groq block browser calls and will fail with a CORS error.
 
-- **Key test** — a Test button sends a minimal request and shows a pass/fail indicator (including CORS/network errors) under the key field.
-- **Model picker** — loads the provider's model list and offers a searchable dropdown.
+- **Key test** — a "Test key & model" button at the bottom of Settings sends a minimal request and tells you exactly what is wrong: key, model name, region block, credits, rate limit, or a provider error.
+- **Model picker** — the provider's model list loads automatically as soon as you enter a key; type in the box to search (on OpenRouter, type `free` for free models). Example model names are shown as a hint. No default model is assumed.
 - **Streaming chat** — tokens stream in as they arrive; Enter to send, Shift+Enter for a new line; stop button while generating.
 - **Markdown rendering** — formatted output with copy buttons on code blocks.
 - **Attachments** — attach images (for vision-capable models).
@@ -53,7 +53,7 @@ The system prompt lives in `config.js` (`APP_CONFIG.systemPrompt`). It is sent w
 | `title` | App name shown in the header and browser tab |
 | `systemPrompt` | The system prompt sent on every request |
 | `defaultBaseUrl` | Default API base URL (OpenAI by default) |
-| `defaultModel` | Default model ID |
+| `defaultModel` | Model ID fallback (empty by default — the model is always chosen by the user) |
 | `defaultTemperature` | Default sampling temperature |
 | `welcomeMessage` | Text shown when there is no conversation yet |
 
@@ -70,7 +70,7 @@ python3 -m http.server 8000
 # open http://localhost:8000
 ```
 
-Then open **Settings**, paste an API key, press **Test**, pick a model, and chat. (Voice input needs a secure context, so it works on `localhost` or HTTPS but not when opening `index.html` directly from disk.)
+Then open **Settings**, paste an API key — the model suggestions load automatically. Type to filter and pick a model, press **Test key & model** to verify, then **Save** and chat. (Voice input needs a secure context, so it works on `localhost` or HTTPS but not when opening `index.html` directly from disk.)
 
 ## Deployment
 
