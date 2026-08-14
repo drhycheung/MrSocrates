@@ -135,6 +135,9 @@
   let recognition = null;
   let listening = false;
   let modelsLoading = false;
+  let modelsAbort = null;
+  let modelsAbortKey = "";
+  let modelsAbortBaseUrl = "";
 
   function defaultSettings() {
     return {
@@ -680,7 +683,6 @@
   }
 
   async function loadModels() {
-    if (modelsLoading) return;
     const key = els.apiKey.value.trim() || settings.apiKey || "";
     const provider = detectProvider(key);
     if (!provider) {
@@ -689,6 +691,15 @@
     }
     const baseUrl = (els.baseUrl.value.trim() || provider.baseUrl).replace(/\/+$/, "");
 
+    if (modelsLoading) {
+      if (modelsAbortKey === key && modelsAbortBaseUrl === baseUrl) return;
+      modelsAbort.abort();
+    }
+
+    const abort = new AbortController();
+    modelsAbort = abort;
+    modelsAbortKey = key;
+    modelsAbortBaseUrl = baseUrl;
     modelsLoading = true;
     els.refreshModels.disabled = true;
     els.modelHint.textContent = "Loading models\u2026";
@@ -696,10 +707,11 @@
     try {
       const headers = { "Content-Type": "application/json" };
       if (key) headers.Authorization = "Bearer " + key;
-      const res = await fetch(baseUrl + "/models", { headers });
+      const res = await fetch(baseUrl + "/models", { headers, signal: abort.signal });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       const ids = (data.data || []).map(function (m) { return m.id; });
+      if (abort.signal.aborted) return;
 
       els.modelList.innerHTML = "";
       ids.slice(0, 300).forEach(function (id) {
@@ -720,10 +732,13 @@
         els.modelHint.textContent += " Free models end with ':free' \u2014 type 'free' in the model box to search them.";
       }
     } catch (err) {
+      if (abort.signal.aborted) return;
       els.modelHint.textContent = "Could not load models: " + (err.message || String(err));
     } finally {
-      modelsLoading = false;
-      els.refreshModels.disabled = false;
+      if (modelsAbort === abort) {
+        modelsLoading = false;
+        els.refreshModels.disabled = false;
+      }
     }
   }
 
