@@ -1,5 +1,7 @@
 # MrSocrates
 
+> **Purpose:** A small experiment in using a *bring-your-own-key* (BYOK) model to explore how AI apps can scale to large classes — or stay affordable when API costs are too high to cover centrally.
+
 A static, zero-backend BYOK (Bring Your Own Key) Socratic-tutor chatbot. Students plug in their own API key from a supported provider and chat with an AI professor that teaches the basics of a topic, then guides them with Socratic questions.
 
 Host it anywhere that serves static files (GitHub Pages, Netlify, Cloudflare Pages, or a local `http.server`). No server, no database, no build step.
