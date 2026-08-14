@@ -950,6 +950,7 @@
   els.apiKey.addEventListener("input", function () {
     setTestResult("", "");
     els.modelList.innerHTML = "";
+    els.model.value = "";
     els.modelHint.textContent = "";
     const provider = detectProvider(els.apiKey.value.trim());
     if (provider) {
