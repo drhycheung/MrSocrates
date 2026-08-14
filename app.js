@@ -53,11 +53,11 @@
   const OLD_DEFAULT_MODELS = ["gpt-4o-mini", "meta/llama-3.3-70b-instruct", "z-ai/glm-5.2"];
   const HISTORY_KEY = "mrsocrates.history";
   const PROVIDERS = [
-    { prefix: /^sk-or-/i, baseUrl: "https://openrouter.ai/api/v1", model: "deepseek/deepseek-chat", name: "OpenRouter" },
-    { prefix: /^sk-poe-/i, baseUrl: "https://api.poe.com/v1", model: "GPT-5.4", name: "Poe" },
-    { prefix: /^nvapi-/i, baseUrl: "https://integrate.api.nvidia.com/v1", model: "meta/llama-3.3-70b-instruct", name: "NVIDIA" },
-    { prefix: /^gsk_/i, baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile", name: "Groq" },
-    { prefix: /^sk-/i, baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini", name: "OpenAI" },
+    { prefix: /^sk-or-/i, baseUrl: "https://openrouter.ai/api/v1", model: "", name: "OpenRouter", examples: ["deepseek/deepseek-chat", "meta-llama/llama-3.3-70b-instruct", "google/gemini-2.0-flash-001", "openai/gpt-4o-mini"] },
+    { prefix: /^sk-poe-/i, baseUrl: "https://api.poe.com/v1", model: "", name: "Poe", examples: ["GPT-5.4", "Claude-Sonnet-4.6", "Llama-3.3-70B-Turbo"] },
+    { prefix: /^nvapi-/i, baseUrl: "https://integrate.api.nvidia.com/v1", model: "", name: "NVIDIA", examples: ["meta/llama-3.3-70b-instruct", "deepseek-ai/deepseek-r1", "qwen/qwen2.5-72b-instruct"] },
+    { prefix: /^gsk_/i, baseUrl: "https://api.groq.com/openai/v1", model: "", name: "Groq", examples: ["llama-3.3-70b-versatile", "openai/gpt-oss-120b", "qwen/qwen3.6-27b"] },
+    { prefix: /^sk-/i, baseUrl: "https://api.openai.com/v1", model: "", name: "OpenAI", examples: ["gpt-4o-mini", "gpt-4o", "gpt-5"] },
   ];
   const KNOWN_MODELS = ["gpt-4o-mini", "meta/llama-3.3-70b-instruct", "z-ai/glm-5.2", "openai/gpt-4o-mini", "GPT-5.4", "llama-3.3-70b-versatile", "deepseek/deepseek-chat"];
 
@@ -96,6 +96,34 @@
       s += " (OpenAI models are region-restricted and may not be available from Hong Kong \u2014 try a non-OpenAI model such as deepseek/deepseek-chat)";
     }
     return s;
+  }
+
+  function classifyTestFailure(status, detail) {
+    const d = String(detail).toLowerCase();
+    const has = function (re) { return re.test(d); };
+    let part;
+    if (status === 401 || has(/invalid api|api key|unauthori|authentication|not authorized|wrong key/)) {
+      part = "the API key is wrong, expired or unauthorised \u2014 check it was copied fully";
+    } else if (status === 404 || has(/model not found|no endpoints|not a valid model|valid model/)) {
+      part = "the model name is wrong or not available on this provider";
+    } else if (has(/region|not available in your region/)) {
+      part = "the model is region-restricted \u2014 OpenAI models are blocked from Hong Kong; try a non-OpenAI model like deepseek/deepseek-chat";
+    } else if (has(/unsupported parameter|temperature/)) {
+      part = "the model does not support one of the request settings (e.g. temperature)";
+    } else if (status === 402 || has(/credit|insufficient|balance|payment|top up/)) {
+      part = "the account has no credits \u2014 top up or use a free model";
+    } else if (status === 429 || has(/rate limit|too many/)) {
+      part = "you are rate limited \u2014 wait a moment and retry";
+    } else if (status >= 500) {
+      part = "the provider server failed \u2014 retry in a moment";
+    } else if (status === 400) {
+      part = "the request was rejected \u2014 check the model name and base URL";
+    } else {
+      part = "the provider rejected the request";
+    }
+    let msg = "Test failed \u2014 " + part + ".";
+    if (detail) msg += " " + detail;
+    return msg;
   }
   const IMAGE_MIME = /^image\/(png|jpe?g|webp|gif)$/;
 
@@ -184,8 +212,8 @@
   }
 
   function updateComposerModel() {
-    const model = settings.model || APP_CONFIG.defaultModel;
-    els.composerModel.textContent = model;
+    const model = settings.model;
+    els.composerModel.textContent = model || "";
     els.composerModel.style.display = model ? "" : "none";
     els.composerModelInput.hidden = true;
   }
@@ -195,7 +223,7 @@
       showToast("Set an API key in Settings first.");
       return;
     }
-    els.composerModelInput.value = settings.model || APP_CONFIG.defaultModel;
+    els.composerModelInput.value = settings.model || "";
     els.composerModelInput.hidden = false;
     els.composerModel.style.display = "none";
     els.composerModelInput.focus();
@@ -372,6 +400,11 @@
     if (!settings.apiKey) {
       openSettings();
       showToast("Add your API key in Settings first.");
+      return;
+    }
+    if (!settings.model) {
+      openSettings();
+      showToast("Choose a model in Settings first.");
       return;
     }
 
@@ -573,7 +606,7 @@
   function saveSettingsFromForm() {
     settings.apiKey = els.apiKey.value.trim();
     settings.baseUrl = els.baseUrl.value.trim() || APP_CONFIG.defaultBaseUrl;
-    settings.model = els.model.value.trim() || APP_CONFIG.defaultModel;
+    settings.model = els.model.value.trim();
     settings.temperature = Number(els.temperature.value);
     saveSettings();
     updateComposerModel();
@@ -600,7 +633,11 @@
       return;
     }
     const baseUrl = (els.baseUrl.value.trim() || provider.baseUrl).replace(/\/+$/, "");
-    const model = els.model.value.trim() || provider.model;
+    const model = els.model.value.trim();
+    if (!model) {
+      setTestResult("fail", "Enter a model name first (e.g. " + provider.examples[0] + ").");
+      return;
+    }
 
     els.testKey.disabled = true;
     setTestResult("pending", "Testing key\u2026");
@@ -626,9 +663,11 @@
         let detail = "";
         try {
           const err = await res.json();
-          detail = (err.error && err.error.message) || err.message || "";
+          detail = describeApiError(err)
+            .replace(/^\s*\u2014\s*/, "")
+            .replace(/\s*\(OpenAI models are region-restricted.*$/, "");
         } catch (e) {}
-        setTestResult("fail", "Key rejected (" + res.status + ")" + (detail ? ": " + detail : ""));
+        setTestResult("fail", classifyTestFailure(res.status, detail));
       }
     } catch (err) {
       setTestResult("fail", "Network / CORS error: " + describeFetchError(err));
@@ -891,10 +930,7 @@
     const provider = detectProvider(els.apiKey.value.trim());
     if (provider) {
       els.baseUrl.value = provider.baseUrl;
-      const currentModel = els.model.value.trim();
-      if (!currentModel || KNOWN_MODELS.indexOf(currentModel) !== -1) {
-        els.model.value = provider.model;
-      }
+      els.modelHint.textContent = "Example models: " + provider.examples.join(", ");
       els.detectedHint.textContent = "Detected: " + provider.name + " (base URL set automatically).";
     } else {
       els.detectedHint.textContent = "";

@@ -676,6 +676,19 @@ body {
   min-height: 18px;
 }
 
+.test-zone {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.test-zone .test-result {
+  flex: 1;
+  padding-top: 6px;
+  line-height: 1.4;
+}
+
 .test-result.ok { color: #22c55e; }
 .test-result.fail { color: var(--danger); }
 .test-result.pending { color: var(--text-muted); font-weight: 400; }
