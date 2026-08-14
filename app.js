@@ -139,7 +139,7 @@
     return {
       apiKey: "",
       baseUrl: APP_CONFIG.defaultBaseUrl,
-      model: APP_CONFIG.defaultModel,
+      model: "",
       temperature: APP_CONFIG.defaultTemperature,
       appId: APP_CONFIG.defaultAppId,
     };
@@ -154,16 +154,18 @@
         if (OLD_DEFAULT_BASE_URLS.indexOf(s.baseUrl) !== -1) {
           s.baseUrl = APP_CONFIG.defaultBaseUrl;
         }
-        if (OLD_DEFAULT_MODELS.indexOf(s.model) !== -1) {
-          s.model = APP_CONFIG.defaultModel;
-        }
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
         localStorage.removeItem(LEGACY_SETTINGS_KEY);
       }
     } catch (e) {}
     try {
       if (raw) {
-        return Object.assign(defaultSettings(), JSON.parse(raw));
+        const s = Object.assign(defaultSettings(), JSON.parse(raw));
+        if (OLD_DEFAULT_MODELS.indexOf(s.model) !== -1) {
+          s.model = "";
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+        }
+        return s;
       }
     } catch (e) {}
     return defaultSettings();
